@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DroidRun Reddit Auto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f1115;
+            --surface: #1e2128;
+            --primary: #FF4500;
+            /* Reddit Orange */
+            --text: #e0e0e0;
+            --secondary-text: #a0a0a0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            background: rgba(30, 33, 40, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            color: var(--secondary-text);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--secondary-text);
+        }
+
+        textarea,
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        textarea:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary {
+            background: #2a2d36;
+        }
+
+        .btn-stop {
+            background: #d32f2f;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            background: #2a2d36;
+            color: var(--secondary-text);
+        }
+
+        .status-badge.active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .logs {
+            background: #000;
+            border-radius: 8px;
+            padding: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Consolas', monospace;
+            font-size: 0.8rem;
+            color: #a0a0a0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 2px;
+        }
+
+        .log-time {
+            color: #555;
+            margin-right: 8px;
+        }
+
+        /* Scrollbar */
+        .logs::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .logs::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        .logs::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>DroidRun Auto</h1>
+        <p>Automate your Reddit posts and replies</p>
+
+        <div class="input-group">
+            <label for="subreddit">Subreddit (e.g., r/iitpatnacampus)</label>
+            <input type="text" id="subreddit" placeholder="r/subreddit_name" value="r/iitpatnacampus">
+        </div>
+
+        <div class="input-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" placeholder="Post Title">
+        </div>
+
+        <div class="input-group">
+            <label for="body">Body (Optional)</label>
+            <textarea id="body" placeholder="What's on your mind?"></textarea>
+            <button class="btn" onclick="postMessage()">Post to Reddit</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-secondary" onclick="startMonitor()">Start Auto-Reply</button>
+            <button class="btn btn-stop" onclick="stopMonitor()">Stop Monitoring</button>
+        </div>
+
+        <div class="status-header">
+            <label>Agent Logs</label>
+            <div id="status-badge" class="status-badge">Idle</div>
+        </div>
+        <div class="logs" id="logs">
+            <!-- Logs will appear here -->
+        </div>
+    </div>
+
+    <script>
+        async function postMessage() {
+            const subreddit = document.getElementById('subreddit').value;
+            const title = document.getElementById('title').value;
+            const body = document.getElementById('body').value;
+
+            if (!subreddit) return alert('Please enter a subreddit');
+            if (!title) return alert('Please enter a title');
+
+            try {
+                const res = await fetch('/post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        body: body,
+                        subreddit: subreddit
+                    })
+                });
+                const data = await res.json();
+                alert(data.message);
+            } catch (e) {
+                alert('Error: ' + e);
+            }
+        }
+
+        async function startMonitor() {
+            try {
+                const res = await fetch('/start_monitor', { method: 'POST' });
+                const data = await res.json();
+                console.log(data);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function stopMonitor() {
+            try {
+                const res = await fetch('/stop_monitor', { method: 'POST' });
+                const data = await res.json();
+                console.log(data);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function updateLogs() {
+            fetch('/logs')
+                .then(res => res.json())
+                .then(data => {
+                    const logsDiv = document.getElementById('logs');
+                    const badge = document.getElementById('status-badge');
+
+                    if (data.is_monitoring) {
+                        badge.textContent = "Monitoring Active";
+                        badge.classList.add('active');
+                    } else {
+                        badge.textContent = "Idle";
+                        badge.classList.remove('active');
+                    }
+
+                    logsDiv.innerHTML = data.logs.map(l => `<div class="log-entry"><span class="log-time">></span>${l}</div>`).reverse().join('');
+                })
+                .catch(e => console.error(e));
+        }
+
+        setInterval(updateLogs, 2000);
+        updateLogs();
+    </script>
+</body>
+
+</html>
